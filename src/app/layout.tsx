@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ToolNetworkFooter } from "@/components/ToolNetworkFooter";
 
 export const metadata: Metadata = {
   title: "AI工具宝 - 智能营销文案生成器",
@@ -14,8 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className="antialiased">
-        {children}
+      <body className="antialiased" style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        <div style={{ flex: 1 }}>{children}</div>
+        <ToolNetworkFooter />
       </body>
     </html>
   );

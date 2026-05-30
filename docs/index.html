@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI工具宝 - 智能营销文案生成器</title>
+  <meta name="description" content="AI驱动的营销文案一键生成工具。支持小红书、抖音、朋友圈、淘宝等多种平台文案。">
+  <meta name="keywords" content="AI文案,营销文案,小红书文案,抖音文案,AI写作,文案生成器,免费文案工具">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #6366f1;
+      --bg: #ffffff;
+      --bg-soft: #f8fafc;
+      --text: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary: #818cf8;
+        --bg: #0f172a;
+        --bg-soft: #1e293b;
+        --text: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --border: #334155;
+        --shadow-lg: 0 10px 40px rgba(0,0,0,0.3);
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh;
+    }
+    .nav {
+      border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 100;
+    }
+    @media (prefers-color-scheme: dark) { .nav { background: rgba(15,23,42,0.8); } }
+    .nav-inner {
+      max-width: 900px; margin: 0 auto; padding: 0 20px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { font-size: 20px; font-weight: 800; text-decoration: none; cursor: pointer; }
+    .logo-icon { font-size: 24px; }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--primary), #a855f7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a { text-decoration: none; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; }
+    .nav-links a:hover { color: var(--primary); }
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .hero { text-align: center; padding: 60px 20px 40px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 99px;
+      background: rgba(99,102,241,0.1); color: var(--primary); font-size: 14px; font-weight: 500; margin-bottom: 24px;
+    }
+    .hero-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .hero h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+    .hero p { font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto 32px; }
+    .card {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 16px;
+      padding: 24px; box-shadow: var(--shadow-lg); margin-bottom: 24px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .form-label .required { color: #ef4444; }
+    .form-label .optional { color: var(--text-secondary); font-weight: 400; }
+    input[type="text"], textarea {
+      width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--bg-soft); font-size: 15px; color: var(--text); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
+    }
+    input[type="text"]:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+    textarea { resize: vertical; min-height: 100px; }
+    .platform-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+    .platform-btn {
+      padding: 10px 12px; border-radius: 10px; border: 2px solid var(--border); background: transparent;
+      cursor: pointer; transition: all 0.2s; font-size: 14px; font-weight: 500; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .platform-btn:hover { border-color: #94a3b8; }
+    .platform-btn.active { border-color: var(--primary); background: rgba(99,102,241,0.08); color: var(--primary); }
+    .style-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .style-tag {
+      padding: 8px 16px; border-radius: 8px; border: none; background: var(--bg-soft);
+      color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+    }
+    .style-tag:hover { background: rgba(99,102,241,0.1); }
+    .style-tag.active { background: rgba(168,85,247,0.15); color: #a855f7; box-shadow: inset 0 0 0 2px rgba(168,85,247,0.3); }
+    .btn-generate {
+      width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 18px; font-weight: 700;
+      color: white; cursor: pointer; background: linear-gradient(135deg, #6366f1, #a855f7);
+      box-shadow: 0 4px 20px rgba(99,102,241,0.3); transition: all 0.2s;
+    }
+    .btn-generate:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 30px rgba(99,102,241,0.4); }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+    .loading-dots { display: inline-flex; gap: 4px; }
+    .loading-dots span { width: 6px; height: 6px; border-radius: 50%; background: white; animation: dot-pulse 1.4s infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dot-pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+    .result-card {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px;
+      margin-bottom: 16px; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .result-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+    .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .result-num { font-size: 14px; font-weight: 600; color: var(--primary); }
+    .btn-copy {
+      padding: 6px 12px; border-radius: 8px; border: none; background: var(--bg-soft);
+      color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-copy:hover { background: rgba(99,102,241,0.1); color: var(--primary); }
+    .btn-copy.copied { background: rgba(34,197,94,0.1); color: #16a34a; }
+    .result-text { white-space: pre-wrap; line-height: 1.7; font-size: 15px; }
+    .error-msg {
+      padding: 12px 16px; border-radius: 12px; background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.2); color: #dc2626; margin-bottom: 16px;
+    }
+    .analysis-text { white-space: pre-wrap; line-height: 1.8; font-size: 15px; }
+    .analysis-warning { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-secondary); }
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }
+    .tool-card {
+      display: block; padding: 24px; border-radius: 16px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); transition: all 0.2s; cursor: pointer;
+    }
+    .tool-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .tool-card .icon { font-size: 32px; margin-bottom: 12px; }
+    .tool-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .tool-card p { font-size: 14px; color: var(--text-secondary); }
+    .tool-card .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+    .tag-hot { background: rgba(239,68,68,0.1); color: #dc2626; }
+    .tag-useful { background: rgba(34,197,94,0.1); color: #16a34a; }
+    .tag-soon { background: var(--bg-soft); color: var(--text-secondary); }
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 60px 0; text-align: center; }
+    @media (max-width: 640px) { .features { grid-template-columns: 1fr; } }
+    footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 13px; color: var(--text-secondary); }
+    .hidden { display: none !important; }
+    .btn-secondary {
+      padding: 14px 32px; border-radius: 12px; border: 2px solid var(--border);
+      background: transparent; color: var(--text); font-weight: 600; font-size: 16px; cursor: pointer;
+    }
+    .btn-hero { width: auto; padding: 14px 32px; font-size: 16px; }
+    .btn-primary-sm {
+      padding: 12px 24px; border-radius: 12px; border: 2px solid var(--primary);
+      background: transparent; color: var(--primary); font-weight: 600; font-size: 15px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav"><div class="nav-inner">
+    <a class="logo" onclick="showHome()"><span class="logo-icon">🤖</span> <span class="gradient-text">AI工具宝</span></a>
+    <div class="nav-links">
+      <a onclick="showTool('copywriter')">文案生成</a>
+      <a onclick="showTool('contract')">合同分析</a>
+    </div>
+  </div></nav>
+
+  <div id="view-home">
+    <div class="hero">
+      <div class="hero-badge"><span class="dot"></span>AI驱动 · 秒级生成 · 完全免费</div>
+      <h1><span class="gradient-text">用AI提升你的工作效率</span></h1>
+      <p>一键生成高质量营销文案、智能分析合同风险——让AI成为你最得力的工作助手</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="showTool('copywriter')" class="btn-generate btn-hero">✍️ 免费生成文案</button>
+        <button onclick="showTool('contract')" class="btn-secondary">📋 合同风险分析</button>
+      </div>
+    </div>
+    <div class="container">
+      <h2 style="text-align:center;font-size:22px;font-weight:700;margin-bottom:24px;">🛠️ AI工具箱</h2>
+      <div class="tools-grid">
+        <div class="tool-card" onclick="showTool('copywriter')">
+          <span class="tag tag-hot">热门</span><div class="icon">✍️</div>
+          <h3>营销文案生成器</h3><p>输入产品信息，秒级生成适合小红书、抖音、朋友圈、淘宝等多平台的营销文案</p>
+        </div>
+        <div class="tool-card" onclick="showTool('contract')">
+          <span class="tag tag-useful">实用</span><div class="icon">📋</div>
+          <h3>合同风险分析</h3><p>粘贴合同内容，AI智能识别风险条款、遗漏保护、不利条款</p>
+        </div>
+        <div class="tool-card" style="opacity:0.5;cursor:default;">
+          <span class="tag tag-soon">即将上线</span><div class="icon">📄</div>
+          <h3>AI简历优化</h3><p>上传简历+目标职位，AI帮你优化关键词和经历描述</p>
+        </div>
+        <div class="tool-card" style="opacity:0.5;cursor:default;">
+          <span class="tag tag-soon">即将上线</span><div class="icon">🌐</div>
+          <h3>智能翻译助手</h3><p>专业级多语言翻译，支持商务、法律、技术等领域</p>
+        </div>
+      </div>
+      <div class="features">
+        <div><div style="font-size:36px;margin-bottom:12px;">⚡</div><div style="font-size:16px;font-weight:700;margin-bottom:6px;">秒级生成</div><div style="font-size:14px;color:var(--text-secondary);">先进的AI模型，秒级响应</div></div>
+        <div><div style="font-size:36px;margin-bottom:12px;">🎯</div><div style="font-size:16px;font-weight:700;margin-bottom:6px;">精准定制</div><div style="font-size:14px;color:var(--text-secondary);">针对不同平台场景优化</div></div>
+        <div><div style="font-size:36px;margin-bottom:12px;">🔒</div><div style="font-size:16px;font-weight:700;margin-bottom:6px;">隐私安全</div><div style="font-size:14px;color:var(--text-secondary);">不存储不泄露</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-copywriter" class="hidden">
+    <div class="container" style="padding-top:40px;">
+      <div style="text-align:center;margin-bottom:32px;">
+        <h1 style="font-size:32px;font-weight:800;margin-bottom:8px;">✍️ 营销文案生成器</h1>
+        <p style="color:var(--text-secondary);font-size:16px;">输入产品信息，3秒生成多平台营销文案</p>
+      </div>
+      <div class="card">
+        <div class="form-group"><label class="form-label">产品名称 <span class="required">*</span></label>
+          <input type="text" id="cp-name" placeholder="例如：晶冻冰皮月饼礼盒"></div>
+        <div class="form-group"><label class="form-label">产品描述 <span class="required">*</span></label>
+          <textarea id="cp-desc" rows="4" placeholder="描述产品的卖点、特色、适用场景等。越详细，文案越精准。"></textarea></div>
+        <div class="form-group"><label class="form-label">目标平台</label>
+          <div class="platform-grid" id="platform-grid"></div></div>
+        <div class="form-group"><label class="form-label">文案风格 <span class="optional">(可选)</span></label>
+          <div class="style-tags" id="style-tags"></div></div>
+        <div class="form-group"><label class="form-label">补充信息 <span class="optional">(可选)</span></label>
+          <textarea id="cp-extra" rows="2" placeholder="目标用户群、价格区间、促销活动等"></textarea></div>
+        <button class="btn-generate" id="btn-cp" onclick="generateCopy()">🚀 一键生成文案</button>
+      </div>
+      <div id="cp-error" class="error-msg hidden"></div>
+      <div id="cp-results"></div>
+    </div>
+  </div>
+
+  <div id="view-contract" class="hidden">
+    <div class="container" style="padding-top:40px;">
+      <div style="text-align:center;margin-bottom:32px;">
+        <h1 style="font-size:32px;font-weight:800;margin-bottom:8px;">📋 合同风险分析</h1>
+        <p style="color:var(--text-secondary);font-size:16px;">粘贴合同内容，AI秒级识别风险条款和遗漏保护</p>
+      </div>
+      <div class="card">
+        <div class="form-group"><label class="form-label">合同内容 <span class="required">*</span></label>
+          <textarea id="ct-text" rows="14" style="font-family:monospace;font-size:13px;" placeholder="粘贴完整的合同内容到这里..."></textarea>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--text-secondary);">
+            <span>支持各类合同文本</span><span id="ct-count">0 / 50000字</span>
+          </div>
+        </div>
+        <button class="btn-generate" id="btn-ct" onclick="analyzeContract()" style="background:linear-gradient(135deg,#f59e0b,#ea580c);">🔍 开始分析</button>
+      </div>
+      <div id="ct-error" class="error-msg hidden"></div>
+      <div id="ct-results"></div>
+    </div>
+  </div>
+
+  <footer><p>© 2026 AI工具宝 · 用AI让工作更高效</p></footer>
+
+<script>
+var API_URL='https://api.deepseek.com/v1/chat/completions';
+var API_KEY='';
+var PLATFORMS=[
+  {id:'xiaohongshu',name:'小红书',icon:'📕'},{id:'douyin',name:'抖音/短视频',icon:'🎵'},
+  {id:'wechat_moments',name:'朋友圈',icon:'💬'},{id:'taobao',name:'淘宝/电商',icon:'🛒'},
+  {id:'weibo',name:'微博',icon:'📱'},{id:'official_account',name:'公众号',icon:'📰'}
+];
+var STYLES=['专业大气','活泼俏皮','走心感人','简洁有力','搞笑幽默','高端格调'];
+var PLATFORM_GUIDES={
+  xiaohongshu:'小红书风格：标题要有emoji和钩子(15字内)，正文短句分段，大量emoji，口语化(姐妹们/yyds/冲冲冲)，结尾互动引导，3-5个话题标签',
+  douyin:'抖音短视频文案：前3秒强钩子(悬念/反转)，口语化接地气，夸张/搞笑/煽情，15-60秒内容节奏，结尾引导关注点赞',
+  wechat_moments:'朋友圈文案：简洁有格调50-100字，文艺/哲理感或接地气路线，emoji点缀不过多',
+  taobao:'淘宝电商详情页：卖点清晰突出优势，用限时/爆款/热卖促转化，场景化描述体验，包含规格功效，营造紧迫感',
+  weibo:'微博文案：话题性强引发讨论，带观点态度，140字以内简洁有力，1-3个热门话题',
+  official_account:'公众号推文：标题吸引不过度标题党，开头抓读者(故事/问题/数据)，正文逻辑清晰分段明确，金句观点，结尾总结互动'
+};
+var currentPlatform='xiaohongshu';
+var currentStyle='';
+
+function init(){
+  var pg=document.getElementById('platform-grid');
+  pg.innerHTML=PLATFORMS.map(function(p){
+    return '<button class="platform-btn '+(p.id===currentPlatform?'active':'')+'" onclick="selectPlatform(\''+p.id+'\')"><span>'+p.icon+'</span> '+p.name+'</button>';
+  }).join('');
+  var st=document.getElementById('style-tags');
+  st.innerHTML=STYLES.map(function(s){return '<button class="style-tag" onclick="selectStyle(\''+s+'\')">'+s+'</button>';}).join('');
+  document.getElementById('ct-text').addEventListener('input',function(){document.getElementById('ct-count').textContent=this.value.length+' / 50000字';});
+  handleHash();
+  window.addEventListener('hashchange',handleHash);
+}
+
+function handleHash(){var h=location.hash.replace('#','');if(h==='copywriter'||h==='contract')showTool(h);}
+function showTool(t){document.getElementById('view-home').classList.add('hidden');document.getElementById('view-copywriter').classList.add('hidden');document.getElementById('view-contract').classList.add('hidden');document.getElementById('view-'+t).classList.remove('hidden');location.hash=t;window.scrollTo(0,0);}
+function showHome(){document.getElementById('view-home').classList.remove('hidden');document.getElementById('view-copywriter').classList.add('hidden');document.getElementById('view-contract').classList.add('hidden');location.hash='';window.scrollTo(0,0);}
+function selectPlatform(id){currentPlatform=id;document.querySelectorAll('.platform-btn').forEach(function(b,i){b.classList.toggle('active',PLATFORMS[i].id===id);});}
+function selectStyle(s){currentStyle=currentStyle===s?'':s;document.querySelectorAll('.style-tag').forEach(function(b){b.classList.toggle('active',b.textContent===currentStyle);});}
+
+async function callAI(msgs,temp){
+  var r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},body:JSON.stringify({model:'deepseek-chat',messages:msgs,temperature:temp||0.8,max_tokens:4000})});
+  if(!r.ok)throw new Error('API错误: '+r.status);
+  var d=await r.json();return d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content||'';
+}
+
+async function generateCopy(){
+  var name=document.getElementById('cp-name').value.trim();
+  var desc=document.getElementById('cp-desc').value.trim();
+  var extra=document.getElementById('cp-extra').value.trim();
+  var errEl=document.getElementById('cp-error');
+  var btn=document.getElementById('btn-cp');
+  if(!name||!desc){errEl.textContent='❌ 请填写产品名称和描述';errEl.classList.remove('hidden');return;}
+  errEl.classList.add('hidden');document.getElementById('cp-results').innerHTML='';
+  btn.disabled=true;btn.innerHTML='<span class="loading-dots"><span></span><span></span><span></span></span> AI正在创作中...';
+  var g=PLATFORM_GUIDES[currentPlatform]||PLATFORM_GUIDES.xiaohongshu;
+  var sys='你是一位资深营销文案策划师。根据产品信息和目标平台生成多套不同角度的营销文案。生成3套文案，每套之间用"---"分隔，每套包含标题和正文。要求：文案有吸引力和转化力，语言自然流畅无AI味。'+(currentStyle?'风格要求：'+currentStyle:'');
+  var usr='产品名称：'+name+'\n产品描述：'+desc+'\n'+(extra?'补充信息：'+extra:'')+'\n\n目标平台：'+currentPlatform+'\n'+g+'\n\n请生成3套不同角度的文案，用"---"分隔。';
+  try{var res=await callAI([{role:'system',content:sys},{role:'user',content:usr}],0.85);var copies=res.split(/---+/).map(function(s){return s.trim()}).filter(function(s){return s.length>10});renderCopies(copies);}
+  catch(e){errEl.textContent='❌ '+(e.message||'生成失败');errEl.classList.remove('hidden');}
+  finally{btn.disabled=false;btn.innerHTML='🚀 一键生成文案';}
+}
+
+function renderCopies(copies){
+  var el=document.getElementById('cp-results');
+  var h='<h2 style="text-align:center;font-size:22px;font-weight:700;margin-bottom:16px;">📝 生成结果</h2>';
+  copies.forEach(function(c,i){
+    h+='<div class="result-card"><div class="result-header"><span class="result-num">文案方案 '+(i+1)+'</span><button class="btn-copy" onclick="copyText(this,'+i+')">📋 复制</button></div><div class="result-text" id="copy-'+i+'">'+escapeHtml(c)+'</div></div>';
+  });
+  h+='<div style="text-align:center;padding:16px 0;"><button onclick="generateCopy()" class="btn-primary-sm">🔄 换一套文案</button></div>';
+  el.innerHTML=h;
+}
+
+async function analyzeContract(){
+  var text=document.getElementById('ct-text').value.trim();
+  var errEl=document.getElementById('ct-error');var btn=document.getElementById('btn-ct');
+  if(text.length<50){errEl.textContent='❌ 请粘贴合同内容（至少50字）';errEl.classList.remove('hidden');return;}
+  errEl.classList.add('hidden');document.getElementById('ct-results').innerHTML='';
+  btn.disabled=true;btn.innerHTML='<span class="loading-dots"><span></span><span></span><span></span></span> AI正在分析中...';
+  var sys='你是一位资深法律顾问。用通俗语言分析合同。\n1.【合同概要】\n2.【风险条款】(⚠️高风险/⚡中风险/💡低风险)\n3.【遗漏条款】\n4.【模糊表述】\n5.【修改建议】\n6.【总体评价】\n注意：不构成法律意见。';
+  try{var res=await callAI([{role:'system',content:sys},{role:'user',content:'请分析以下合同：\n\n'+text}],0.3);
+    document.getElementById('ct-results').innerHTML='<div class="card"><div class="result-header"><span style="font-size:18px;font-weight:700;">🔍 分析报告</span><button class="btn-copy" onclick="copyText(this,\'analysis\')">📋 复制报告</button></div><div class="analysis-text" id="analysis-text">'+escapeHtml(res)+'</div><div class="analysis-warning">⚠️ AI辅助分析，仅供参考，不构成法律意见。</div></div>';}
+  catch(e){errEl.textContent='❌ '+(e.message||'分析失败');errEl.classList.remove('hidden');}
+  finally{btn.disabled=false;btn.innerHTML='🔍 开始分析';}
+}
+
+function escapeHtml(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+function copyText(btn,id){
+  var t=id==='analysis'?document.getElementById('analysis-text').textContent:document.getElementById('copy-'+id).textContent;
+  navigator.clipboard.writeText(t).then(function(){btn.textContent='✅ 已复制';btn.classList.add('copied');setTimeout(function(){btn.textContent=id==='analysis'?'📋 复制报告':'📋 复制';btn.classList.remove('copied');},2000);});
+}
+init();
+</script>
+</body>
+</html>
